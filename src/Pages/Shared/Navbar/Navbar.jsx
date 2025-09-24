@@ -1,6 +1,7 @@
 import {Link} from "react-router-dom"
 
 const Navbar = () => {
+
   const navOptions = (
     <>
       <li>
@@ -11,6 +12,12 @@ const Navbar = () => {
       </li>
       <li>
         <Link to="/order/salad">Order</Link>
+      </li>
+      <li>
+        <Link to="/login">Login</Link>
+      </li>
+      <li>
+        <Link to="/signup">Sign Up</Link>
       </li>
     </>
   );

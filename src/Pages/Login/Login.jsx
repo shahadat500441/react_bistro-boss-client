@@ -1,39 +1,65 @@
-import {Link} from "react-router-dom"
-    import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from 'react-simple-captcha';
- import { useEffect, useRef } from 'react';
-import { useState,useContext } from 'react';
+import { useContext, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  LoadCanvasTemplate,
+  loadCaptchaEnginge,
+  validateCaptcha,
+} from "react-simple-captcha";
+import Swal from "sweetalert2";
 import { AuthContext } from "../../provider/AuthProvider";
 
 const Login = () => {
-  const {signIn}= useContext(AuthContext)
-    const captchaRef = useRef(null);
-    const [disabled, setDisabled]= useState(true)
+  const { signIn } = useContext(AuthContext);
 
-    useEffect(()=>{
-          loadCaptchaEnginge(6)
-    },[])
-    const handelLogin = (e)=>{
-        e.preventDefault();
-        const form = e.target;
-        const email = form.email.value;
-        const password = form.password.value;
-        console.log(email,password)
-        signIn(email,password)
-        .then(result=>{
-          const user = result.user;
-          console.log(user)
-        })
-    }
+  const [disabled, setDisabled] = useState(true);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from?.pathname || "/";
 
-    const handelValidateReCaptcha = ()=>{
-        const value = captchaRef.current.value;
-        console.log(value)
-        if(validateCaptcha(value)){
-            setDisabled(false)
-        }else{
-            setDisabled(true)
-        }
+  useEffect(() => {
+    loadCaptchaEnginge(6);
+  }, []);
+  const handelLogin = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const email = form.email.value;
+    const password = form.password.value;
+    console.log(email, password);
+    signIn(email, password)
+    .then((result) => {
+      const user = result.user;
+      console.log(user);
+
+      Swal.fire({
+        title: "User Login Successful",
+        showClass: {
+          popup: `
+      animate__animated
+      animate__fadeInUp
+      animate__faster
+    `,
+        },
+        hideClass: {
+          popup: `
+      animate__animated
+      animate__fadeOutDown
+      animate__faster
+    `,
+        },
+      });
+      navigate(from, {replace:true});
+    });
+  };
+
+  const handelValidateReCaptcha = (e) => {
+    const value = e.target.value;
+    console.log(value);
+    if (validateCaptcha(value)) {
+      setDisabled(false);
+    } else {
+      setDisabled(true);
     }
+  };
   return (
     <div className="flex justify-center items-center ">
       <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg  lg:max-w-4xl ">
@@ -134,30 +160,27 @@ const Login = () => {
                   className="block mb-2 text-sm font-medium text-gray-600 "
                   htmlFor="loggingPassword"
                 >
-               <LoadCanvasTemplate/>
+                  <LoadCanvasTemplate />
                 </label>
               </div>
 
               <input
                 id="loggingPassword"
-                ref={captchaRef}
-               
+                onBlur={handelValidateReCaptcha}
                 name=""
                 className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg    focus:border-blue-400 focus:ring-opacity-40  focus:outline-none focus:ring focus:ring-blue-300"
                 type="text"
               />
-              <button onClick={handelValidateReCaptcha} className="btn btn-outline w-full mt-2">Validate</button>
             </div>
 
             <div className="mt-6">
               <button
                 type="submit"
-                disabled={disabled}
+               disabled={disabled}
                 className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-green-600 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50"
               >
-               Login
+                Login
               </button>
-              
             </div>
           </form>
 
